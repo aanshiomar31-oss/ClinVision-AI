@@ -1,147 +1,211 @@
-# LLaVA-MedRAG Web Interface
+# ClinVision AI
 
-A simple medical image analysis chatbot interface for the LLaVA-Med custom RAG implimentation for medical imaging. 
+Enterprise Clinical AI Assistant for Multimodal Medical Analysis
 
-## Features
+ClinVision AI is a full-stack healthcare AI application that combines a React frontend, FastAPI backend, and Groq-powered Large Language Models to provide an interactive clinical assistant for medical image discussions and healthcare knowledge workflows.
 
-
-## Live Demo
-
-[https://llava-medrag.github.io/](https://llava-medrag.github.io/)
-
-## Quick Start
-
-### Prerequisites
-- Node.js 18+ and npm
-- FastAPI backend (optional, for full functionality)
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/LLaVA-MedRAG/LLaVA-MedRAG.github.io.git
-cd LLaVA-MedRAG.github.io
-
-# Install dependencies
-npm install
-```
-
-### Development Server
-
-```bash
-npm run dev
-```
-Access at `http://localhost:5173`
-
-## Deployment Options
-
-### Option 1: GitHub Pages (Free Hosting)
-
-```bash
-npm run deploy
-```
-
-### Option 2: Custom Server with HTTP
-
-1. **Update configuration** in `vite.config.ts`:
-```typescript
-export default defineConfig({
-  plugins: [react()],
-  base: '/',  // Remove GitHub Pages base path
-  server: {
-    host: '0.0.0.0',
-    port: 5173
-  }
-})
-```
-
-2. **Build and serve**:
-```bash
-npm run build
-npm install -g serve
-serve -s dist -p 5173
-```
-
-3. **Or with PM2** (recommended for production):
-```bash
-npm install -g pm2
-npm run build
-pm2 serve dist 5173 --name llava-medrag
-pm2 save
-```
-
-### Option 3: Docker Deployment
-
-Create `Dockerfile`:
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-RUN npm install -g serve
-EXPOSE 5173
-CMD ["serve", "-s", "dist", "-p", "5173"]
-```
-
-Deploy:
-```bash
-docker build -t llava-medrag .
-docker run -d -p 5173:5173 llava-medrag
-```
-
-## Backend Configuration
-
-Update API endpoints in `src/App.tsx`:
-
-```typescript
-// Line ~70 and ~123
-const response = await fetch('http://YOUR_SERVER:8000/status');
-const response = await fetch('http://YOUR_SERVER:8000/chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify(requestBody)
-});
-```
-
-### Expected Backend Endpoints
-
-**GET** `/status` - Health check
-```json
-{ "status": "online" }
-```
-
-**POST** `/chat` - Process chat message
-```json
-{
-  "mode": "Auto | BrainMRI | ChestX-ray | Histopathology",
-  "message": { "text": "...", "image": "base64 or null", "timestamp": "..." },
-  "history": { "messages": [...], "images": [...] },
-  "chat_id": "..."
-}
-```
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── TopBar.tsx      # Status bar with online indicator
-│   ├── Sidebar.tsx     # Chat list and mode selector
-│   └── ChatWindow.tsx  # Main chat interface
-├── App.tsx             # Application logic
-└── main.tsx            # Entry point
-```
-
-## License
-
-MIT License
-
-## Author
-
-Hasitha Gallella - [GitHub](https://github.com/HasithaGallella)
+The project demonstrates modern AI application development practices, including modular frontend architecture, REST API communication, environment-based configuration, and local deployment.
 
 ---
 
-Built with React + TypeScript + Vite
+## Features
+
+- AI-powered clinical conversation interface
+- Multiple clinical modes:
+  - Brain MRI
+  - Chest X-ray
+  - Histopathology
+  - Clinical Guidelines
+- FastAPI-powered backend
+- Groq LLM integration through LangChain
+- Persistent local chat history
+- Environment-based configuration
+- Modular React component architecture
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|--------|------------|
+| Frontend | React + TypeScript |
+| Build Tool | Vite |
+| Backend | FastAPI |
+| AI Framework | LangChain |
+| LLM | Groq |
+| Styling | CSS |
+| Version Control | Git & GitHub |
+
+---
+
+## Project Architecture
+
+ClinVision AI follows a client-server architecture where the frontend manages user interactions, the backend orchestrates AI requests, and Groq handles language model inference through LangChain.
+
+### Architecture Diagram
+
+```text
+                         ┌─────────────────────────┐
+                         │        User             │
+                         │  Clinical Interaction   │
+                         └───────────┬─────────────┘
+                                     │
+                                     ▼
+               ┌─────────────────────────────────┐
+               │ React + TypeScript Frontend     │
+               │ • Chat Interface                │
+               │ • Clinical Modes                │
+               │ • Local Chat History            │
+               └──────────────┬──────────────────┘
+                              │ REST API
+                              ▼
+               ┌─────────────────────────────────┐
+               │ FastAPI Backend                 │
+               │ • Request Validation            │
+               │ • Prompt Processing             │
+               │ • API Orchestration             │
+               └──────────────┬──────────────────┘
+                              │
+                              ▼
+               ┌─────────────────────────────────┐
+               │ LangChain + Groq LLM            │
+               │ • Medical Reasoning             │
+               │ • Clinical Responses            │
+               └──────────────┬──────────────────┘
+                              │
+                              ▼
+               ┌─────────────────────────────────┐
+               │ AI-Generated Clinical Response  │
+               └─────────────────────────────────┘
+```
+
+### Request Flow
+
+1. User selects a clinical mode.
+2. React frontend captures the prompt and optional image input.
+3. FastAPI receives the request through REST endpoints.
+4. LangChain structures the prompt for the Groq LLM.
+5. Groq generates the AI-powered clinical response.
+6. The backend returns the response to the frontend.
+7. Conversation history is stored locally for future sessions.
+
+---
+
+## Project Structure
+
+```text
+ClinVision-AI/
+├── src/
+│   ├── components/
+│   │   ├── TopBar.tsx
+│   │   ├── Sidebar.tsx
+│   │   └── ChatWindow.tsx
+│   ├── App.tsx
+│   └── main.tsx
+├── public/
+├── Fast_API.py
+├── requirements.txt
+├── package.json
+├── .env
+└── README.md
+```
+
+### Core Components
+
+| Component | Purpose |
+|-----------|---------|
+| `App.tsx` | Application state and API communication |
+| `Sidebar.tsx` | Chat history and clinical mode selection |
+| `TopBar.tsx` | Branding and backend status |
+| `ChatWindow.tsx` | Conversation interface |
+| `Fast_API.py` | Backend API and LLM orchestration |
+
+---
+
+## Getting Started
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/aanshiomar31-oss/ClinVision-AI.git
+cd ClinVision-AI
+```
+
+### Frontend Setup
+
+```bash
+npm install
+npm run dev
+```
+
+Frontend runs at:
+
+```text
+http://localhost:5173
+```
+
+### Backend Setup
+
+```bash
+pip install -r requirements.txt
+python3 Fast_API.py
+```
+
+Backend runs at:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the project root.
+
+```env
+VITE_API_URL=http://127.0.0.1:8000
+GROQ_API_KEY=your_groq_api_key
+```
+
+---
+
+## Screenshots
+
+Add application screenshots after the UI refinement.
+
+- Dashboard
+- Chat Interface
+- Clinical Modes
+- Backend Running
+
+---
+
+## Engineering Contributions
+
+This version extends the original foundation with several practical software engineering improvements:
+
+- Rebranded the application into ClinVision AI.
+- Replaced hardcoded backend URLs with environment-variable configuration.
+- Added a reproducible Python dependency setup (`requirements.txt`).
+- Integrated a local FastAPI deployment workflow.
+- Introduced a Clinical Guidelines workflow mode.
+- Improved UI styling and project organization.
+- Configured secure environment variable management.
+
+---
+
+## Roadmap
+
+- Clinical Guidelines PDF ingestion
+- Retrieval-Augmented Generation (RAG)
+- Docker deployment
+- User authentication
+- Cloud deployment
+- Conversation export
+
+---
+
+## Acknowledgements
+
+This project builds upon an open-source medical AI interface and has been extended with new branding, deployment improvements, configuration enhancements, and additional application workflows as part of my software engineering portfolio.
